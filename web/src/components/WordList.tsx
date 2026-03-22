@@ -52,7 +52,6 @@ export default function WordList() {
             <tr>
               <th>英語</th>
               <th>日本語</th>
-              <th>タグ</th>
             </tr>
           </thead>
           <tbody>
@@ -60,7 +59,6 @@ export default function WordList() {
               <tr key={w.id}>
                 <td>{w.en}</td>
                 <td>{w.ja}</td>
-                <td className="tags">{w.tags.join(", ")}</td>
               </tr>
             ))}
           </tbody>

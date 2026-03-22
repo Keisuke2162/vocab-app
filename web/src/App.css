@@ -45,9 +45,9 @@ button:hover:not(:disabled) {
 }
 
 button.active {
-  background: #1d1d1f;
-  color: #fff;
-  border-color: #1d1d1f;
+  background: #e8f2ff;
+  color: #0071e3;
+  border-color: #0071e3;
 }
 
 button:disabled {
