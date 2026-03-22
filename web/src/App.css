@@ -186,6 +186,18 @@ button:disabled {
   padding: 60px 20px;
 }
 
+@media (max-width: 480px) {
+  .quiz-result {
+    padding: 32px 0;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 8px 6px;
+    font-size: 0.82rem;
+  }
+}
+
 .quiz-result h2 {
   font-size: 1.4rem;
   font-weight: 600;

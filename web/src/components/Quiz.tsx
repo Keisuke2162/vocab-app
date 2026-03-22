@@ -63,6 +63,8 @@ export default function Quiz() {
   const handleSelect = (wordId: string) => {
     if (selected !== null) return;
 
+    (document.activeElement as HTMLElement)?.blur();
+
     const question = questions[currentIndex];
     const isCorrect = wordId === question.id;
 
