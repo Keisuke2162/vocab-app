@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import type { Word } from "../types";
-import { fetchWords } from "../api";
-
-type Tag = "all" | "swift" | "news";
-
-const TAG_LABELS: Record<Tag, string> = {
-  all: "すべて",
-  swift: "swift",
-  news: "news",
-};
+import { fetchWords, fetchTags } from "../api";
 
 export default function WordList() {
   const [words, setWords] = useState<Word[]>([]);
-  const [tag, setTag] = useState<Tag>("all");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tag, setTag] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchTags().then(setTags).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -28,13 +25,13 @@ export default function WordList() {
   return (
     <div>
       <div className="filter-bar">
-        {(["all", "swift", "news"] as Tag[]).map((t) => (
+        {(["all", ...tags]).map((t) => (
           <button
             key={t}
             className={tag === t ? "active" : ""}
             onClick={() => setTag(t)}
           >
-            {TAG_LABELS[t]}
+            {t === "all" ? "すべて" : t}
           </button>
         ))}
       </div>
