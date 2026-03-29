@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Word } from "../types";
-import { fetchWords } from "../api";
+import { fetchWords, fetchTags } from "../api";
 
 type Mode = "en-ja" | "ja-en";
-type QuizState = "loading" | "question" | "result";
+type QuizState = "loading" | "setup" | "question" | "result";
 
 interface AnswerRecord {
   question: Word;
@@ -11,6 +11,7 @@ interface AnswerRecord {
 }
 
 const MAX_QUESTIONS = 20;
+const CHOICE_COUNT_OPTIONS = [4, 5, 6, 7, 8, 9, 10];
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -21,15 +22,19 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function buildChoices(correct: Word, all: Word[]): Word[] {
+function buildChoices(correct: Word, all: Word[], count: number): Word[] {
   const others = all.filter((w) => w.id !== correct.id);
-  const wrong = shuffle(others).slice(0, 3);
+  const wrong = shuffle(others).slice(0, count - 1);
   return shuffle([correct, ...wrong]);
 }
 
 export default function Quiz() {
   const [mode, setMode] = useState<Mode>("en-ja");
+  const [tags, setTags] = useState<string[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [choiceCount, setChoiceCount] = useState<number>(4);
   const [allWords, setAllWords] = useState<Word[]>([]);
+  const [filteredWords, setFilteredWords] = useState<Word[]>([]);
   const [questions, setQuestions] = useState<Word[]>([]);
   const [choices, setChoices] = useState<Word[][]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,9 +43,9 @@ export default function Quiz() {
   const [quizState, setQuizState] = useState<QuizState>("loading");
   const [error, setError] = useState<string | null>(null);
 
-  const startQuiz = useCallback((words: Word[]) => {
+  const startQuiz = useCallback((words: Word[], count: number) => {
     const qs = shuffle(words).slice(0, MAX_QUESTIONS);
-    const cs = qs.map((q) => buildChoices(q, words));
+    const cs = qs.map((q) => buildChoices(q, words, count));
     setQuestions(qs);
     setChoices(cs);
     setCurrentIndex(0);
@@ -50,15 +55,25 @@ export default function Quiz() {
   }, []);
 
   useEffect(() => {
-    fetchWords()
-      .then((words) => {
+    Promise.all([fetchWords(), fetchTags()])
+      .then(([words, fetchedTags]) => {
         setAllWords(words);
-        startQuiz(words);
+        setFilteredWords(words);
+        setTags(fetchedTags);
+        setQuizState("setup");
       })
       .catch((e: Error) => {
         setError(e.message);
       });
-  }, [startQuiz]);
+  }, []);
+
+  useEffect(() => {
+    if (selectedTag === "all") {
+      setFilteredWords(allWords);
+    } else {
+      setFilteredWords(allWords.filter((w) => w.tags.includes(selectedTag)));
+    }
+  }, [selectedTag, allWords]);
 
   const handleSelect = (wordId: string) => {
     if (selected !== null) return;
@@ -74,15 +89,68 @@ export default function Quiz() {
     setTimeout(() => {
       if (currentIndex + 1 >= questions.length) {
         setQuizState("result");
+        window.scrollTo({ top: 0 });
       } else {
         setCurrentIndex((i) => i + 1);
         setSelected(null);
+        window.scrollTo({ top: 0 });
       }
     }, 900);
   };
 
   if (error) return <p className="error">{error}</p>;
   if (quizState === "loading") return <p className="status">読み込み中...</p>;
+
+  if (quizState === "setup") {
+    const canStart = filteredWords.length >= choiceCount;
+    return (
+      <div className="quiz-setup">
+        <div className="setup-section">
+          <p className="setup-label">カテゴリ</p>
+          <div className="filter-bar">
+            {(["all", ...tags]).map((t) => (
+              <button
+                key={t}
+                className={selectedTag === t ? "active" : ""}
+                onClick={() => setSelectedTag(t)}
+              >
+                {t === "all" ? "すべて" : t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="setup-section">
+          <p className="setup-label">択数</p>
+          <div className="filter-bar">
+            {CHOICE_COUNT_OPTIONS.map((n) => (
+              <button
+                key={n}
+                className={choiceCount === n ? "active" : ""}
+                onClick={() => setChoiceCount(n)}
+              >
+                {n}択
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {!canStart && (
+          <p className="error">
+            このカテゴリの単語数（{filteredWords.length}件）が択数（{choiceCount}）より少ないため開始できません
+          </p>
+        )}
+
+        <button
+          className="start-btn"
+          onClick={() => startQuiz(filteredWords, choiceCount)}
+          disabled={!canStart}
+        >
+          スタート
+        </button>
+      </div>
+    );
+  }
 
   if (quizState === "result") {
     const score = records.filter((r) => r.isCorrect).length;
@@ -112,7 +180,7 @@ export default function Quiz() {
           </tbody>
         </table>
 
-        <button className="restart-btn" onClick={() => startQuiz(allWords)}>
+        <button className="restart-btn" onClick={() => setQuizState("setup")}>
           もう一度
         </button>
       </div>

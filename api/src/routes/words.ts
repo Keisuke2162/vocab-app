@@ -27,6 +27,17 @@ words.get("/", async (c) => {
   return c.json({ data });
 });
 
+// GET /words/tags
+words.get("/tags", async (c) => {
+  const { data, error } = await supabase.rpc("get_distinct_tags");
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ data });
+});
+
 // GET /words/:id
 words.get("/:id", async (c) => {
   const id = c.req.param("id");

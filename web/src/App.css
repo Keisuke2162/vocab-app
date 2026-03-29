@@ -69,6 +69,7 @@ button:disabled {
 /* Word List */
 .filter-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -113,6 +114,32 @@ button:disabled {
   color: #6e6e73;
 }
 
+/* Quiz Setup */
+.quiz-setup {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.setup-section {
+  margin-bottom: 28px;
+}
+
+.setup-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.start-btn {
+  padding: 12px 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
 /* Quiz */
 .quiz {
   max-width: 600px;
@@ -155,6 +182,12 @@ button:disabled {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
 }
 
 .choice {
