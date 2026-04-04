@@ -113,52 +113,48 @@ export default function Quiz() {
       <div className="quiz-setup">
         <div className="setup-section">
           <p className="setup-label">カテゴリ</p>
-          <div className="filter-bar">
-            {(["all", ...tags]).map((t) => (
-              <button
-                key={t}
-                className={selectedTag === t ? "active" : ""}
-                onClick={() => setSelectedTag(t)}
-              >
-                {t === "all" ? "すべて" : t}
-              </button>
+          <select
+            className="setup-select"
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+          >
+            <option value="all">すべて</option>
+            {tags.map((t) => (
+              <option key={t} value={t}>{t}</option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="setup-section">
           <p className="setup-label">出典</p>
-          <div className="filter-bar">
-            {(["all", ...sources]).map((s) => (
-              <button
-                key={s}
-                className={selectedSource === s ? "active" : ""}
-                onClick={() => setSelectedSource(s)}
-              >
-                {s === "all" ? "すべて" : s}
-              </button>
+          <select
+            className="setup-select"
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+          >
+            <option value="all">すべて</option>
+            {sources.map((s) => (
+              <option key={s} value={s}>{s}</option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="setup-section">
           <p className="setup-label">択数</p>
-          <div className="filter-bar">
+          <select
+            className="setup-select"
+            value={choiceCount}
+            onChange={(e) => setChoiceCount(Number(e.target.value))}
+          >
             {CHOICE_COUNT_OPTIONS.map((n) => (
-              <button
-                key={n}
-                className={choiceCount === n ? "active" : ""}
-                onClick={() => setChoiceCount(n)}
-              >
-                {n}択
-              </button>
+              <option key={n} value={n}>{n}択</option>
             ))}
-          </div>
+          </select>
         </div>
 
         {!canStart && (
           <p className="error">
-            このカテゴリの単語数（{filteredWords.length}件）が択数（{choiceCount}）より少ないため開始できません
+            単語数（{filteredWords.length}件）が択数（{choiceCount}）より少ないため開始できません
           </p>
         )}
 
