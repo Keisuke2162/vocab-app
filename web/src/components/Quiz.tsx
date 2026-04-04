@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Word } from "../types";
-import { fetchWords, fetchTags } from "../api";
+import { fetchWords, fetchTags, fetchSources } from "../api";
 
 type Mode = "en-ja" | "ja-en";
 type QuizState = "loading" | "setup" | "question" | "result";
@@ -32,6 +32,8 @@ export default function Quiz() {
   const [mode, setMode] = useState<Mode>("en-ja");
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [sources, setSources] = useState<string[]>([]);
+  const [selectedSource, setSelectedSource] = useState<string>("all");
   const [choiceCount, setChoiceCount] = useState<number>(4);
   const [allWords, setAllWords] = useState<Word[]>([]);
   const [filteredWords, setFilteredWords] = useState<Word[]>([]);
@@ -55,11 +57,12 @@ export default function Quiz() {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchWords(), fetchTags()])
-      .then(([words, fetchedTags]) => {
+    Promise.all([fetchWords(), fetchTags(), fetchSources()])
+      .then(([words, fetchedTags, fetchedSources]) => {
         setAllWords(words);
         setFilteredWords(words);
         setTags(fetchedTags);
+        setSources(fetchedSources);
         setQuizState("setup");
       })
       .catch((e: Error) => {
@@ -68,12 +71,15 @@ export default function Quiz() {
   }, []);
 
   useEffect(() => {
-    if (selectedTag === "all") {
-      setFilteredWords(allWords);
-    } else {
-      setFilteredWords(allWords.filter((w) => w.tags.includes(selectedTag)));
+    let words = allWords;
+    if (selectedTag !== "all") {
+      words = words.filter((w) => w.tags.includes(selectedTag));
     }
-  }, [selectedTag, allWords]);
+    if (selectedSource !== "all") {
+      words = words.filter((w) => w.source === selectedSource);
+    }
+    setFilteredWords(words);
+  }, [selectedTag, selectedSource, allWords]);
 
   const handleSelect = (wordId: string) => {
     if (selected !== null) return;
@@ -115,6 +121,21 @@ export default function Quiz() {
                 onClick={() => setSelectedTag(t)}
               >
                 {t === "all" ? "すべて" : t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="setup-section">
+          <p className="setup-label">出典</p>
+          <div className="filter-bar">
+            {(["all", ...sources]).map((s) => (
+              <button
+                key={s}
+                className={selectedSource === s ? "active" : ""}
+                onClick={() => setSelectedSource(s)}
+              >
+                {s === "all" ? "すべて" : s}
               </button>
             ))}
           </div>
@@ -215,6 +236,7 @@ export default function Quiz() {
 
       <div className="question">
         <p>{question}</p>
+        {current.source && <span className="question-source">{current.source}</span>}
       </div>
 
       <div className="choices">
