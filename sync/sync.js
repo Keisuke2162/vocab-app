@@ -37,6 +37,9 @@ async function fetchAllNotionPages() {
 function parseNotionPage(page) {
   const props = page.properties;
 
+  const isUnnecessary = props["不要"]?.checkbox ?? false;
+  if (isUnnecessary) return null;
+
   const en =
     props["単語、熟語"]?.title?.map((t) => t.plain_text).join("") ?? "";
 
@@ -46,7 +49,9 @@ function parseNotionPage(page) {
   const tags =
     props["選択"]?.multi_select?.map((s) => s.name) ?? [];
 
-  return { notion_id: page.id, en, ja, tags };
+  const source = props["出典"]?.select?.name ?? null;
+
+  return { notion_id: page.id, en, ja, tags, source };
 }
 
 async function syncToSupabase(records) {
@@ -57,6 +62,12 @@ async function syncToSupabase(records) {
   console.log("\nSupabaseへの同期を開始...");
 
   for (const record of records) {
+    if (record === null) {
+      console.log("  スキップ (不要フラグあり)");
+      skipped++;
+      continue;
+    }
+
     if (!record.en.trim() || !record.ja.trim()) {
       console.log(`  スキップ (en/ja が空): notion_id=${record.notion_id}`);
       skipped++;
@@ -69,6 +80,7 @@ async function syncToSupabase(records) {
         en: record.en.trim(),
         ja: record.ja.trim(),
         tags: record.tags,
+        source: record.source,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "notion_id" }
