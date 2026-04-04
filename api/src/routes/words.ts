@@ -11,11 +11,16 @@ const words = new Hono();
 // GET /words
 words.get("/", async (c) => {
   const tag = c.req.query("tags");
+  const source = c.req.query("source");
 
-  let query = supabase.from("words").select("id, en, ja, tags");
+  let query = supabase.from("words").select("id, en, ja, tags, source");
 
   if (tag) {
     query = query.contains("tags", [tag]);
+  }
+
+  if (source) {
+    query = query.eq("source", source);
   }
 
   const { data, error } = await query;
@@ -38,13 +43,24 @@ words.get("/tags", async (c) => {
   return c.json({ data });
 });
 
+// GET /words/sources
+words.get("/sources", async (c) => {
+  const { data, error } = await supabase.rpc("get_distinct_sources");
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ data });
+});
+
 // GET /words/:id
 words.get("/:id", async (c) => {
   const id = c.req.param("id");
 
   const { data, error } = await supabase
     .from("words")
-    .select("id, en, ja, tags")
+    .select("id, en, ja, tags, source")
     .eq("id", id)
     .single();
 
