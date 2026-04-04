@@ -3,4 +3,5 @@ export interface Word {
   en: string;
   ja: string;
   tags: string[];
+  source: string | null;
 }
