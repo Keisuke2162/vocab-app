@@ -10,7 +10,8 @@ interface AnswerRecord {
   isCorrect: boolean;
 }
 
-const MAX_QUESTIONS = 20;
+type QuestionCount = 5 | 10 | 20 | 50 | "unlimited";
+const QUESTION_COUNT_OPTIONS: QuestionCount[] = [5, 10, 20, 50, "unlimited"];
 const CHOICE_COUNT_OPTIONS = [4, 5, 6, 7, 8, 9, 10];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -34,6 +35,7 @@ export default function Quiz() {
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [sources, setSources] = useState<string[]>([]);
   const [selectedSource, setSelectedSource] = useState<string>("all");
+  const [questionCount, setQuestionCount] = useState<QuestionCount>(20);
   const [choiceCount, setChoiceCount] = useState<number>(4);
   const [allWords, setAllWords] = useState<Word[]>([]);
   const [filteredWords, setFilteredWords] = useState<Word[]>([]);
@@ -45,8 +47,9 @@ export default function Quiz() {
   const [quizState, setQuizState] = useState<QuizState>("loading");
   const [error, setError] = useState<string | null>(null);
 
-  const startQuiz = useCallback((words: Word[], count: number) => {
-    const qs = shuffle(words).slice(0, MAX_QUESTIONS);
+  const startQuiz = useCallback((words: Word[], count: number, qCount: QuestionCount) => {
+    const limit = qCount === "unlimited" ? words.length : qCount;
+    const qs = shuffle(words).slice(0, limit);
     const cs = qs.map((q) => buildChoices(q, words, count));
     setQuestions(qs);
     setChoices(cs);
@@ -140,6 +143,22 @@ export default function Quiz() {
         </div>
 
         <div className="setup-section">
+          <p className="setup-label">問題数</p>
+          <select
+            className="setup-select"
+            value={questionCount}
+            onChange={(e) => {
+              const v = e.target.value;
+              setQuestionCount(v === "unlimited" ? "unlimited" : (Number(v) as QuestionCount));
+            }}
+          >
+            {QUESTION_COUNT_OPTIONS.map((n) => (
+              <option key={n} value={n}>{n === "unlimited" ? "無制限" : `${n}問`}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="setup-section">
           <p className="setup-label">択数</p>
           <select
             className="setup-select"
@@ -160,7 +179,7 @@ export default function Quiz() {
 
         <button
           className="start-btn"
-          onClick={() => startQuiz(filteredWords, choiceCount)}
+          onClick={() => startQuiz(filteredWords, choiceCount, questionCount)}
           disabled={!canStart}
         >
           スタート
