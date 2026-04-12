@@ -325,6 +325,257 @@ button:disabled {
   margin-top: 8px;
 }
 
+/* Sub navigation */
+.sub-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 16px;
+}
+
+/* Word table actions */
+.word-table .quiz-check {
+  width: 52px;
+  text-align: center;
+}
+
+.word-table tr.quiz-off td {
+  color: #aaa;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.inline-edit {
+  padding: 4px 8px;
+  border: 1px solid #0071e3;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-edit-sm {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid #d2d2d7;
+  background: #fff;
+  cursor: pointer;
+  color: #1d1d1f;
+}
+
+.btn-save-sm {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: none;
+  background: #0071e3;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-cancel-sm {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid #d2d2d7;
+  background: #fff;
+  color: #6e6e73;
+  cursor: pointer;
+}
+
+.btn-delete-sm {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid #f87171;
+  background: #fff;
+  color: #d4000f;
+  cursor: pointer;
+}
+
+.btn-delete-sm:hover {
+  background: #fee2e2;
+}
+
+/* Tag Manager */
+.tag-manager {
+  max-width: 480px;
+}
+
+.tag-create-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tag-input {
+  flex: 1;
+}
+
+.btn-add {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #0071e3;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-add:disabled {
+  background: #c7d4e4;
+  cursor: not-allowed;
+}
+
+.tag-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.tag-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tag-list-item:last-child {
+  border-bottom: none;
+}
+
+.tag-list-name {
+  font-size: 0.9rem;
+  color: #1d1d1f;
+}
+
+/* Article List */
+.article-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.article-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.article-list-item:last-child {
+  border-bottom: none;
+}
+
+.article-list-item:hover {
+  background: #f9f9fb;
+}
+
+.article-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.article-list-title {
+  font-size: 0.95rem;
+  color: #1d1d1f;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.article-list-date {
+  font-size: 0.78rem;
+  color: #6e6e73;
+}
+
+/* Article Detail */
+.article-detail {
+  max-width: 720px;
+}
+
+.btn-back {
+  font-size: 0.88rem;
+  color: #0071e3;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.btn-back:hover {
+  text-decoration: underline;
+  background: none;
+}
+
+.article-detail-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 4px;
+}
+
+.article-detail-date {
+  font-size: 0.82rem;
+  color: #6e6e73;
+  margin-bottom: 28px;
+}
+
+.detail-section {
+  margin-bottom: 32px;
+}
+
+.detail-section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+.commentary-text {
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #1d1d1f;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin: 0;
+}
+
 /* Word List */
 .filter-bar {
   display: flex;

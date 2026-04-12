@@ -16,6 +16,13 @@ export interface Article {
   created_at: string;
 }
 
+export interface ArticleWithWords extends Article {
+  original_text: string | null;
+  translation: string | null;
+  commentary: string | null;
+  words: Pick<Word, "id" | "en" | "ja" | "tags" | "quiz_enabled">[];
+}
+
 export interface Tag {
   id: string;
   name: string;

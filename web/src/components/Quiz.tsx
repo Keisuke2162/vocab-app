@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Word } from "../types";
 import { fetchWords, fetchTags, fetchSources } from "../api";
+import { useAuth } from "../contexts/AuthContext";
 
 type Mode = "en-ja" | "ja-en";
 type QuizState = "loading" | "setup" | "question" | "result";
@@ -30,6 +31,8 @@ function buildChoices(correct: Word, all: Word[], count: number): Word[] {
 }
 
 export default function Quiz() {
+  const { session } = useAuth();
+  const userId = session?.user.id;
   const [mode, setMode] = useState<Mode>("en-ja");
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string>("all");
@@ -60,10 +63,11 @@ export default function Quiz() {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchWords(), fetchTags(), fetchSources()])
+    Promise.all([fetchWords(undefined, undefined, userId), fetchTags(), fetchSources()])
       .then(([words, fetchedTags, fetchedSources]) => {
-        setAllWords(words);
-        setFilteredWords(words);
+        const quizWords = words.filter((w) => w.quiz_enabled);
+        setAllWords(quizWords);
+        setFilteredWords(quizWords);
         setTags(fetchedTags);
         setSources(fetchedSources);
         setQuizState("setup");
@@ -71,7 +75,7 @@ export default function Quiz() {
       .catch((e: Error) => {
         setError(e.message);
       });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     let words = allWords;
