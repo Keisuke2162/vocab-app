@@ -39,11 +39,11 @@ extract.post("/words", async (c) => {
     model: "claude-sonnet-4-6",
     max_tokens: 16384,
     system:
-      "あなたは英語教育のスペシャリストです。基本的な英語はわかるが語彙・熟語・表現は乏しい日本語話者向けに、英語記事から学習すべき語彙・表現を漏れなく抽出します。専門的な記事も扱います。指定のJSON形式のみで返してください。",
+      "あなたは英語教育のスペシャリストです。基本的な英語はわかるが語彙・熟語・表現は乏しい日本語話者向けに、英語記事から学習すべき語彙と表現を漏れなく抽出します。専門的な記事も扱います。指定のJSON形式のみで返してください。",
     messages: [
       {
         role: "user",
-        content: `以下の英語記事から、英語学習に役立つ単語・熟語・表現を漏れなく全て抽出してください。1記事あたり通常50〜150語程度になるはずです。\n\n【必ず含める】\n1. 中級〜上級の英単語\n   例: "pragmatic", "rationale", "motivation", "shortcoming", "computation", "scope", "payload", "equivalent", "drawback", "failable", "syntax", "explicit", "behavior"\n2. 句動詞・イディオム・汎用表現（4語以内）\n   例: "result in", "lay out", "given that", "allow for", "as part of", "in the meantime", "break apart", "conform to", "not only A but B", "in the way of"\n3. 専門・技術用語\n   例: "implement", "refactor", "breaking change", "asynchronous", "closure"\n\n【除外するもの】\n- 超基本単語のみ（"go", "get", "make", "have", "be", "do", "say" など中学1年レベル）\n- コードそのもの（コードブロック・変数名・関数呼び出しなど）\n- 5語以上の長いフレーズ・完全な文\n- URL・固有名詞（人名・製品名など）\n\n【日本語訳】簡潔に（例: "lay out" → "説明する・提示する"、"result in" → "〜という結果になる"）\n\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [\n    { "en": "...", "ja": "..." }\n  ]\n}\n\n記事:\n${body.text}`,
+        content: `以下の英語記事から、wordsとexpressionsを分けて漏れなく抽出してください。\n\n【words】中級以上の単語・専門用語\n- 除外: 超基本単語（go, get, make, have, be等）・コード・固有名詞\n\n【expressions】記事中に登場する全ての複数語の固定表現\n- 対象: 句動詞（動詞+前置詞）・接続表現・慣用的な前置詞句・イディオム\n- 基準: 「単語を個別に知っていても意味が分かりにくい組み合わせ」または「直訳すると誤訳しやすいもの」\n- 4語以内。記事に出てくる表現は漏れなく全て含める\n- 除外: "of the", "in a" のような文法的な結合のみ\n\n【日本語訳】簡潔に\n\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [ { "en": "...", "ja": "..." } ],\n  "expressions": [ { "en": "...", "ja": "..." } ]\n}\n\n記事:\n${body.text}`,
       },
     ],
   });
@@ -57,7 +57,10 @@ extract.post("/words", async (c) => {
 
   try {
     const parsed = JSON.parse(cleaned);
-    return c.json({ data: parsed });
+    // words と expressions を結合して返す
+    const words = parsed.words ?? [];
+    const expressions = parsed.expressions ?? [];
+    return c.json({ data: { words: [...words, ...expressions] } });
   } catch (e) {
     console.error("[extract/words] JSON parse error:", e, "cleaned:", cleaned.slice(0, 200));
     const reason = e instanceof Error ? e.message : String(e);
