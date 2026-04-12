@@ -36,14 +36,14 @@ extract.post("/words", async (c) => {
   }
 
   const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 8192,
+    model: "claude-sonnet-4-6",
+    max_tokens: 16384,
     system:
-      "あなたは英語教育のスペシャリストです。基本的な英語はわかるが語彙・熟語・表現は乏しい日本語話者向けに、英語記事から学習すべき語彙・表現を抽出します。専門的な記事も扱います。指定のJSON形式のみで返してください。",
+      "あなたは英語教育のスペシャリストです。基本的な英語はわかるが語彙・熟語・表現は乏しい日本語話者向けに、英語記事から学習すべき語彙・表現を漏れなく抽出します。専門的な記事も扱います。指定のJSON形式のみで返してください。",
     messages: [
       {
         role: "user",
-        content: `以下の英語記事から、英語学習に役立つ単語・熟語・表現を抽出してください。\n\n【抽出対象】\n- 中級以上の英単語（"pragmatic", "rationale", "failable", "drawback" など）\n- 熟語・句動詞・汎用表現（"lay out", "result in", "given that", "as part of", "allow for" など）\n- 専門用語・技術語彙（"implement", "refactor", "breaking change" など）\n\n【除外】\n- 超基本単語（"use", "make", "go", "get" など小学・中学1年レベル）\n- コードとして書かれたもの（コードブロック・変数名・関数呼び出しなど）\n- 完全な文章・URL・固有名詞\n\n【形式】\n- 表現は4語程度まで（クイズ用）\n- 日本語訳は簡潔に（例: "pragmatic" → "実用的な"、"lay out" → "説明する・提示する"）\n\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [\n    { "en": "...", "ja": "..." }\n  ]\n}\n\n記事:\n${body.text}`,
+        content: `以下の英語記事から、英語学習に役立つ単語・熟語・表現を漏れなく抽出してください。\n\n- 中級以上の英単語・専門用語・技術語彙を全て含める\n- 句動詞・イディオム・汎用表現（4語以内）も含める\n- 除外: 超基本単語（中学1年レベル）・コード・完全な文・URL・固有名詞\n- 日本語訳は簡潔に\n\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [\n    { "en": "...", "ja": "..." }\n  ]\n}\n\n記事:\n${body.text}`,
       },
     ],
   });
