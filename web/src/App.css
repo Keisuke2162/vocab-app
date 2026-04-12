@@ -576,6 +576,32 @@ button:disabled {
   margin: 0;
 }
 
+/* Settings */
+.settings {
+  max-width: 480px;
+}
+
+.api-key-input {
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.settings-hint {
+  font-size: 0.82rem;
+  color: #6e6e73;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.settings-hint a {
+  color: #0071e3;
+  text-decoration: none;
+}
+
+.settings-hint a:hover {
+  text-decoration: underline;
+}
+
 /* Word List */
 .filter-bar {
   display: flex;
