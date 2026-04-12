@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Word } from "../types";
-import { fetchWords, fetchTags, fetchSources } from "../api";
+import { fetchWords } from "../api";
 import { useAuth } from "../contexts/AuthContext";
 
 type Mode = "en-ja" | "ja-en";
@@ -63,13 +63,17 @@ export default function Quiz() {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchWords(undefined, undefined, userId), fetchTags(), fetchSources()])
-      .then(([words, fetchedTags, fetchedSources]) => {
+    fetchWords(undefined, undefined, userId)
+      .then((words) => {
         const quizWords = words.filter((w) => w.quiz_enabled);
+        const derivedTags = [...new Set(quizWords.flatMap((w) => w.tags))].sort();
+        const derivedSources = [
+          ...new Set(quizWords.map((w) => w.source).filter((s): s is string => s !== null)),
+        ].sort();
         setAllWords(quizWords);
         setFilteredWords(quizWords);
-        setTags(fetchedTags);
-        setSources(fetchedSources);
+        setTags(derivedTags);
+        setSources(derivedSources);
         setQuizState("setup");
       })
       .catch((e: Error) => {

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import type { Word } from "../types";
-import { fetchWords, fetchTags, patchWord, deleteWord } from "../api";
+import { fetchWords, patchWord, deleteWord } from "../api";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function WordList() {
@@ -8,8 +8,7 @@ export default function WordList() {
   const token = session?.access_token ?? "";
   const userId = session?.user.id;
 
-  const [words, setWords] = useState<Word[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
+  const [allWords, setAllWords] = useState<Word[]>([]);
   const [tag, setTag] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,21 +17,27 @@ export default function WordList() {
   const [editJa, setEditJa] = useState("");
 
   useEffect(() => {
-    fetchTags().then(setTags).catch(() => {});
-  }, []);
-
-  useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchWords(tag === "all" ? undefined : tag, undefined, userId)
-      .then(setWords)
+    fetchWords(undefined, undefined, userId)
+      .then(setAllWords)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [tag, userId]);
+  }, [userId]);
+
+  const tags = useMemo(
+    () => [...new Set(allWords.flatMap((w) => w.tags))].sort(),
+    [allWords]
+  );
+
+  const words = useMemo(
+    () => (tag === "all" ? allWords : allWords.filter((w) => w.tags.includes(tag))),
+    [allWords, tag]
+  );
 
   const handleToggleQuiz = async (word: Word) => {
     const updated = await patchWord(token, word.id, { quiz_enabled: !word.quiz_enabled });
-    setWords((prev) => prev.map((w) => (w.id === word.id ? updated : w)));
+    setAllWords((prev) => prev.map((w) => (w.id === word.id ? updated : w)));
   };
 
   const startEdit = (word: Word) => {
@@ -43,14 +48,14 @@ export default function WordList() {
 
   const handleSaveEdit = async (id: string) => {
     const updated = await patchWord(token, id, { en: editEn, ja: editJa });
-    setWords((prev) => prev.map((w) => (w.id === id ? updated : w)));
+    setAllWords((prev) => prev.map((w) => (w.id === id ? updated : w)));
     setEditingId(null);
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("この単語を削除しますか？")) return;
     await deleteWord(token, id);
-    setWords((prev) => prev.filter((w) => w.id !== id));
+    setAllWords((prev) => prev.filter((w) => w.id !== id));
   };
 
   return (
