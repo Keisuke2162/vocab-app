@@ -60,7 +60,8 @@ extract.post("/words", async (c) => {
     return c.json({ data: parsed });
   } catch (e) {
     console.error("[extract/words] JSON parse error:", e, "cleaned:", cleaned.slice(0, 200));
-    return c.json({ error: "単語の抽出に失敗しました。再試行してください。" }, 500);
+    const reason = e instanceof Error ? e.message : String(e);
+    return c.json({ error: `単語の抽出に失敗しました: ${reason}` }, 500);
   }
 });
 
