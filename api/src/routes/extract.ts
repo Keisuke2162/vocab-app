@@ -49,12 +49,17 @@ extract.post("/words", async (c) => {
   });
 
   const raw = message.content[0].type === "text" ? message.content[0].text : "";
-  const cleaned = raw.replace(/^```(?:json)?\s*/m, "").replace(/```\s*$/m, "").trim();
+  console.log("[extract/words] raw response:", raw.slice(0, 200));
+
+  // markdownコードブロック除去 or JSON部分を直接抽出
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  const cleaned = jsonMatch ? jsonMatch[0] : raw.trim();
 
   try {
     const parsed = JSON.parse(cleaned);
     return c.json({ data: parsed });
-  } catch {
+  } catch (e) {
+    console.error("[extract/words] JSON parse error:", e, "cleaned:", cleaned.slice(0, 200));
     return c.json({ error: "単語の抽出に失敗しました。再試行してください。" }, 500);
   }
 });
