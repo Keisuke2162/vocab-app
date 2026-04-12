@@ -36,8 +36,8 @@ extract.post("/words", async (c) => {
   }
 
   const message = await client.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 32768,
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 8192,
     system:
       "あなたは英語教育のスペシャリストです。与えられた英語記事に登場する単語・熟語・表現を全て抽出し、指定のJSON形式のみで返してください。",
     messages: [
