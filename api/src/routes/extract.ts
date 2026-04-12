@@ -49,9 +49,10 @@ extract.post("/words", async (c) => {
   });
 
   const raw = message.content[0].type === "text" ? message.content[0].text : "";
+  const cleaned = raw.replace(/^```(?:json)?\s*/m, "").replace(/```\s*$/m, "").trim();
 
   try {
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(cleaned);
     return c.json({ data: parsed });
   } catch {
     return c.json({ error: "単語の抽出に失敗しました。再試行してください。" }, 500);
