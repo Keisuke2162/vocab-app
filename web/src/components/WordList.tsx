@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import type { Word } from "../types";
-import { fetchWords, fetchTags } from "../api";
+import { fetchWords, fetchTags, patchWord, deleteWord } from "../api";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function WordList() {
+  const { session } = useAuth();
+  const token = session?.access_token ?? "";
+  const userId = session?.user.id;
+
   const [words, setWords] = useState<Word[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tag, setTag] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editEn, setEditEn] = useState("");
+  const [editJa, setEditJa] = useState("");
 
   useEffect(() => {
     fetchTags().then(setTags).catch(() => {});
@@ -16,16 +24,39 @@ export default function WordList() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchWords(tag === "all" ? undefined : tag)
+    fetchWords(tag === "all" ? undefined : tag, undefined, userId)
       .then(setWords)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [tag]);
+  }, [tag, userId]);
+
+  const handleToggleQuiz = async (word: Word) => {
+    const updated = await patchWord(token, word.id, { quiz_enabled: !word.quiz_enabled });
+    setWords((prev) => prev.map((w) => (w.id === word.id ? updated : w)));
+  };
+
+  const startEdit = (word: Word) => {
+    setEditingId(word.id);
+    setEditEn(word.en);
+    setEditJa(word.ja);
+  };
+
+  const handleSaveEdit = async (id: string) => {
+    const updated = await patchWord(token, id, { en: editEn, ja: editJa });
+    setWords((prev) => prev.map((w) => (w.id === id ? updated : w)));
+    setEditingId(null);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("この単語を削除しますか？")) return;
+    await deleteWord(token, id);
+    setWords((prev) => prev.filter((w) => w.id !== id));
+  };
 
   return (
     <div>
       <div className="filter-bar">
-        {(["all", ...tags]).map((t) => (
+        {["all", ...tags].map((t) => (
           <button
             key={t}
             className={tag === t ? "active" : ""}
@@ -47,17 +78,56 @@ export default function WordList() {
         <table className="word-table">
           <thead>
             <tr>
+              <th>クイズ</th>
               <th>英語</th>
               <th>日本語</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {words.map((w) => (
-              <tr key={w.id}>
-                <td>{w.en}</td>
-                <td>{w.ja}</td>
-              </tr>
-            ))}
+            {words.map((w) =>
+              editingId === w.id ? (
+                <tr key={w.id}>
+                  <td className="quiz-check">
+                    <input type="checkbox" checked={w.quiz_enabled} readOnly />
+                  </td>
+                  <td>
+                    <input
+                      className="inline-edit"
+                      value={editEn}
+                      onChange={(e) => setEditEn(e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      className="inline-edit"
+                      value={editJa}
+                      onChange={(e) => setEditJa(e.target.value)}
+                    />
+                  </td>
+                  <td className="row-actions">
+                    <button className="btn-save-sm" onClick={() => handleSaveEdit(w.id)}>保存</button>
+                    <button className="btn-cancel-sm" onClick={() => setEditingId(null)}>キャンセル</button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={w.id} className={w.quiz_enabled ? "" : "quiz-off"}>
+                  <td className="quiz-check">
+                    <input
+                      type="checkbox"
+                      checked={w.quiz_enabled}
+                      onChange={() => handleToggleQuiz(w)}
+                    />
+                  </td>
+                  <td>{w.en}</td>
+                  <td>{w.ja}</td>
+                  <td className="row-actions">
+                    <button className="btn-edit-sm" onClick={() => startEdit(w)}>編集</button>
+                    <button className="btn-delete-sm" onClick={() => handleDelete(w.id)}>削除</button>
+                  </td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       )}

@@ -2,11 +2,12 @@ import { useState } from "react";
 import WordList from "./components/WordList";
 import Quiz from "./components/Quiz";
 import ArticleRegister from "./components/ArticleRegister";
+import Management from "./components/Management";
 import Login from "./components/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
-type Tab = "list" | "quiz" | "register";
+type Tab = "list" | "quiz" | "register" | "manage";
 
 function AppContent() {
   const [tab, setTab] = useState<Tab>("list");
@@ -38,6 +39,12 @@ function AppContent() {
           >
             記事登録
           </button>
+          <button
+            className={tab === "manage" ? "active" : ""}
+            onClick={() => setTab("manage")}
+          >
+            管理
+          </button>
         </nav>
         <button className="signout-btn" onClick={signOut}>
           ログアウト
@@ -47,6 +54,7 @@ function AppContent() {
         {tab === "list" && <WordList />}
         {tab === "quiz" && <Quiz />}
         {tab === "register" && <ArticleRegister />}
+        {tab === "manage" && <Management />}
       </main>
     </div>
   );

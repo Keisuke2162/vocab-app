@@ -1,4 +1,4 @@
-import type { Word, Article, Tag, ExtractedWord } from "./types";
+import type { Word, Article, ArticleWithWords, Tag, ExtractedWord } from "./types";
 
 const BASE = import.meta.env.VITE_API_URL as string;
 
@@ -18,10 +18,15 @@ export async function fetchSources(): Promise<string[]> {
   return json.data as string[];
 }
 
-export async function fetchWords(tag?: string, source?: string): Promise<Word[]> {
+export async function fetchWords(
+  tag?: string,
+  source?: string,
+  userId?: string
+): Promise<Word[]> {
   const params = new URLSearchParams();
   if (tag) params.set("tags", tag);
   if (source) params.set("source", source);
+  if (userId) params.set("user_id", userId);
   const query = params.toString();
   const url = query ? `${BASE}/words?${query}` : `${BASE}/words`;
   const res = await fetch(url);
@@ -63,21 +68,50 @@ export async function createTag(token: string, name: string): Promise<Tag> {
   return json.data as Tag;
 }
 
-// ─── Extract ────────────────────────────────────────────────────────────────
+export async function deleteTag(token: string, id: string): Promise<void> {
+  await authFetch(`${BASE}/tags/${id}`, token, { method: "DELETE" });
+}
 
-export async function extractWords(
+// ─── Words ──────────────────────────────────────────────────────────────────
+
+export async function patchWord(
   token: string,
-  text: string
-): Promise<ExtractedWord[]> {
-  const json = await authFetch(`${BASE}/extract/words`, token, {
-    method: "POST",
-    body: JSON.stringify({ text }),
+  id: string,
+  data: { en?: string; ja?: string; tags?: string[]; quiz_enabled?: boolean }
+): Promise<Word> {
+  const json = await authFetch(`${BASE}/words/${id}`, token, {
+    method: "PATCH",
+    body: JSON.stringify(data),
   });
-  const words = (json.data as { words: { en: string; ja: string }[] }).words;
-  return words.map((w) => ({ ...w, quiz_enabled: true }));
+  return json.data as Word;
+}
+
+export async function deleteWord(token: string, id: string): Promise<void> {
+  await authFetch(`${BASE}/words/${id}`, token, { method: "DELETE" });
+}
+
+export async function saveWord(
+  token: string,
+  data: { en: string; ja: string; tags: string[]; article_id: string; quiz_enabled: boolean }
+): Promise<Word> {
+  const json = await authFetch(`${BASE}/words`, token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return json.data as Word;
 }
 
 // ─── Articles ───────────────────────────────────────────────────────────────
+
+export async function fetchArticles(token: string): Promise<Article[]> {
+  const json = await authFetch(`${BASE}/articles`, token);
+  return json.data as Article[];
+}
+
+export async function fetchArticle(token: string, id: string): Promise<ArticleWithWords> {
+  const json = await authFetch(`${BASE}/articles/${id}`, token);
+  return json.data as ArticleWithWords;
+}
 
 export async function saveArticle(
   token: string,
@@ -90,15 +124,20 @@ export async function saveArticle(
   return json.data as Article;
 }
 
-// ─── Words ──────────────────────────────────────────────────────────────────
+export async function deleteArticle(token: string, id: string): Promise<void> {
+  await authFetch(`${BASE}/articles/${id}`, token, { method: "DELETE" });
+}
 
-export async function saveWord(
+// ─── Extract ────────────────────────────────────────────────────────────────
+
+export async function extractWords(
   token: string,
-  data: { en: string; ja: string; tags: string[]; article_id: string; quiz_enabled: boolean }
-): Promise<Word> {
-  const json = await authFetch(`${BASE}/words`, token, {
+  text: string
+): Promise<ExtractedWord[]> {
+  const json = await authFetch(`${BASE}/extract/words`, token, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify({ text }),
   });
-  return json.data as Word;
+  const words = (json.data as { words: { en: string; ja: string }[] }).words;
+  return words.map((w) => ({ ...w, quiz_enabled: true }));
 }
