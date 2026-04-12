@@ -74,6 +74,7 @@ words.post("/", authMiddleware, async (c) => {
     en: string;
     ja: string;
     tags?: string[];
+    source?: string;
     article_id?: string;
     quiz_enabled?: boolean;
   }>();
@@ -85,6 +86,7 @@ words.post("/", authMiddleware, async (c) => {
       en: body.en,
       ja: body.ja,
       tags: body.tags ?? [],
+      source: body.source ?? null,
       article_id: body.article_id ?? null,
       quiz_enabled: body.quiz_enabled ?? true,
     })

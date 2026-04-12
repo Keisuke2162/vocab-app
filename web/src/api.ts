@@ -95,7 +95,7 @@ export async function deleteWord(token: string, id: string): Promise<void> {
 
 export async function saveWord(
   token: string,
-  data: { en: string; ja: string; tags: string[]; article_id: string; quiz_enabled: boolean }
+  data: { en: string; ja: string; tags: string[]; source?: string; article_id: string; quiz_enabled: boolean }
 ): Promise<Word> {
   const json = await authFetch(`${BASE}/words`, token, {
     method: "POST",

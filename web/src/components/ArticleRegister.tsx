@@ -74,6 +74,7 @@ export default function ArticleRegister() {
             en: w.en,
             ja: w.ja,
             tags: selectedTags,
+            source: title,
             article_id: article.id,
             quiz_enabled: w.quiz_enabled,
           })
