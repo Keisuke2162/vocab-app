@@ -37,13 +37,13 @@ extract.post("/words", async (c) => {
 
   const message = await client.messages.create({
     model: "claude-opus-4-6",
-    max_tokens: 4096,
+    max_tokens: 16384,
     system:
-      "あなたは英語教育のスペシャリストです。与えられた英語記事に登場する単語・熟語・表現を全て抽出し、指定のJSON形式のみで返してください。",
+      "あなたは英語教育のスペシャリストです。与えられた英語記事に登場する重要な単語・熟語・表現を抽出し、指定のJSON形式のみで返してください。",
     messages: [
       {
         role: "user",
-        content: `以下の英語記事に登場する単語・熟語・表現を全て抽出してください。\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [\n    { "en": "...", "ja": "..." }\n  ]\n}\n\n記事:\n${body.text}`,
+        content: `以下の英語記事に登場する重要な単語・熟語・表現を最大100件抽出してください。\n説明文や前置きは不要です。JSONのみ返してください。\n\n{\n  "words": [\n    { "en": "...", "ja": "..." }\n  ]\n}\n\n記事:\n${body.text}`,
       },
     ],
   });
