@@ -4,17 +4,22 @@ const BASE = import.meta.env.VITE_API_URL as string;
 
 // ─── Unauthenticated ────────────────────────────────────────────────────────
 
+async function publicFetch(url: string) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    throw new Error((json as { error?: string }).error ?? `Request failed: ${res.status}`);
+  }
+  return res.json();
+}
+
 export async function fetchTags(): Promise<string[]> {
-  const res = await fetch(`${BASE}/words/tags`);
-  if (!res.ok) throw new Error("Failed to fetch tags");
-  const json = await res.json();
+  const json = await publicFetch(`${BASE}/words/tags`);
   return json.data as string[];
 }
 
 export async function fetchSources(): Promise<string[]> {
-  const res = await fetch(`${BASE}/words/sources`);
-  if (!res.ok) throw new Error("Failed to fetch sources");
-  const json = await res.json();
+  const json = await publicFetch(`${BASE}/words/sources`);
   return json.data as string[];
 }
 
@@ -29,9 +34,7 @@ export async function fetchWords(
   if (userId) params.set("user_id", userId);
   const query = params.toString();
   const url = query ? `${BASE}/words?${query}` : `${BASE}/words`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch words");
-  const json = await res.json();
+  const json = await publicFetch(url);
   return json.data as Word[];
 }
 
