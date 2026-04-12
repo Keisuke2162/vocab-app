@@ -2,8 +2,9 @@ import { useState } from "react";
 import TagManager from "./TagManager";
 import ArticleList from "./ArticleList";
 import ArticleDetail from "./ArticleDetail";
+import Settings from "./Settings";
 
-type ManagementTab = "tags" | "articles";
+type ManagementTab = "articles" | "tags" | "settings";
 
 export default function Management() {
   const [tab, setTab] = useState<ManagementTab>("articles");
@@ -24,9 +25,17 @@ export default function Management() {
         >
           タグ管理
         </button>
+        <button
+          className={tab === "settings" ? "active" : ""}
+          onClick={() => setTab("settings")}
+        >
+          設定
+        </button>
       </div>
 
       {tab === "tags" && <TagManager />}
+
+      {tab === "settings" && <Settings />}
 
       {tab === "articles" && !selectedArticleId && (
         <ArticleList onSelect={(id) => setSelectedArticleId(id)} />
