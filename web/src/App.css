@@ -56,9 +56,9 @@
 
 /* Layout */
 .app {
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 header {
@@ -132,6 +132,10 @@ main {
 
 /* ─── スマホ ─── */
 @media (max-width: 640px) {
+  .app {
+    padding: 0 20px;
+  }
+
   .hamburger-btn {
     display: flex;
   }
@@ -625,7 +629,7 @@ button:disabled {
 
 /* Article Detail */
 .article-detail {
-  max-width: 720px;
+  max-width: 900px;
 }
 
 .btn-back {
@@ -749,6 +753,29 @@ button:disabled {
   border: none;
   border-top: 1px solid #e5e5ea;
   margin: 1em 0;
+}
+
+.commentary-text table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8em 0;
+  font-size: 0.88rem;
+}
+
+.commentary-text th,
+.commentary-text td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.commentary-text th {
+  background: #f5f5f7;
+  font-weight: 600;
+}
+
+.commentary-text tr:nth-child(even) td {
+  background: #fafafa;
 }
 
 .generate-commentary-btn {

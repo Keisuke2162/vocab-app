@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { ArticleWithWords } from "../types";
 import { fetchArticle, patchWord, extractCommentary, patchArticle } from "../api";
 import { useAuth } from "../contexts/AuthContext";
@@ -74,7 +75,7 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
         <h3 className="detail-section-title">解説</h3>
         {article.commentary ? (
           <div className="commentary-text">
-            <ReactMarkdown>{article.commentary}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.commentary}</ReactMarkdown>
           </div>
         ) : (
           <>
