@@ -56,9 +56,9 @@
 
 /* Layout */
 .app {
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 header {
@@ -132,6 +132,10 @@ main {
 
 /* ─── スマホ ─── */
 @media (max-width: 640px) {
+  .app {
+    padding: 0 20px;
+  }
+
   .hamburger-btn {
     display: flex;
   }
@@ -625,7 +629,7 @@ button:disabled {
 
 /* Article Detail */
 .article-detail {
-  max-width: 720px;
+  max-width: 900px;
 }
 
 .btn-back {
