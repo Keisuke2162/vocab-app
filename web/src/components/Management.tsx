@@ -1,24 +1,15 @@
 import { useState } from "react";
 import TagManager from "./TagManager";
-import ArticleList from "./ArticleList";
-import ArticleDetail from "./ArticleDetail";
 import Settings from "./Settings";
 
-type ManagementTab = "articles" | "tags" | "settings";
+type ManagementTab = "tags" | "settings";
 
 export default function Management() {
-  const [tab, setTab] = useState<ManagementTab>("articles");
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [tab, setTab] = useState<ManagementTab>("tags");
 
   return (
     <div>
       <div className="sub-nav">
-        <button
-          className={tab === "articles" ? "active" : ""}
-          onClick={() => { setTab("articles"); setSelectedArticleId(null); }}
-        >
-          記事一覧
-        </button>
         <button
           className={tab === "tags" ? "active" : ""}
           onClick={() => setTab("tags")}
@@ -34,19 +25,7 @@ export default function Management() {
       </div>
 
       {tab === "tags" && <TagManager />}
-
       {tab === "settings" && <Settings />}
-
-      {tab === "articles" && !selectedArticleId && (
-        <ArticleList onSelect={(id) => setSelectedArticleId(id)} />
-      )}
-
-      {tab === "articles" && selectedArticleId && (
-        <ArticleDetail
-          articleId={selectedArticleId}
-          onBack={() => setSelectedArticleId(null)}
-        />
-      )}
     </div>
   );
 }

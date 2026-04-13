@@ -2,15 +2,18 @@ import { useState } from "react";
 import WordList from "./components/WordList";
 import Quiz from "./components/Quiz";
 import ArticleRegister from "./components/ArticleRegister";
+import ArticleList from "./components/ArticleList";
+import ArticleDetail from "./components/ArticleDetail";
 import Management from "./components/Management";
 import Login from "./components/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
-type Tab = "list" | "quiz" | "register" | "manage";
+type Tab = "list" | "quiz" | "articles" | "register" | "manage";
 
 function AppContent() {
   const [tab, setTab] = useState<Tab>("list");
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const { user, loading, signOut } = useAuth();
 
   if (loading) return <p className="status">読み込み中...</p>;
@@ -34,6 +37,12 @@ function AppContent() {
             クイズ
           </button>
           <button
+            className={tab === "articles" ? "active" : ""}
+            onClick={() => { setTab("articles"); setSelectedArticleId(null); }}
+          >
+            記事
+          </button>
+          <button
             className={tab === "register" ? "active" : ""}
             onClick={() => setTab("register")}
           >
@@ -53,6 +62,15 @@ function AppContent() {
       <main>
         {tab === "list" && <WordList />}
         {tab === "quiz" && <Quiz />}
+        {tab === "articles" && !selectedArticleId && (
+          <ArticleList onSelect={(id) => setSelectedArticleId(id)} />
+        )}
+        {tab === "articles" && selectedArticleId && (
+          <ArticleDetail
+            articleId={selectedArticleId}
+            onBack={() => setSelectedArticleId(null)}
+          />
+        )}
         {tab === "register" && <ArticleRegister />}
         {tab === "manage" && <Management />}
       </main>
