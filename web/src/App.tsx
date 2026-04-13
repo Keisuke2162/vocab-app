@@ -14,51 +14,73 @@ type Tab = "list" | "quiz" | "articles" | "register" | "manage";
 function AppContent() {
   const [tab, setTab] = useState<Tab>("list");
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
 
   if (loading) return <p className="status">読み込み中...</p>;
   if (!user) return <Login />;
 
+  const navigate = (next: Tab) => {
+    setTab(next);
+    setMenuOpen(false);
+    if (next !== "articles") setSelectedArticleId(null);
+  };
+
   return (
     <div className="app">
       <header>
         <h1>Vocab App</h1>
-        <nav>
+        <nav className={menuOpen ? "nav-open" : ""}>
           <button
             className={tab === "list" ? "active" : ""}
-            onClick={() => setTab("list")}
+            onClick={() => navigate("list")}
           >
             一覧
           </button>
           <button
             className={tab === "quiz" ? "active" : ""}
-            onClick={() => setTab("quiz")}
+            onClick={() => navigate("quiz")}
           >
             クイズ
           </button>
           <button
             className={tab === "articles" ? "active" : ""}
-            onClick={() => { setTab("articles"); setSelectedArticleId(null); }}
+            onClick={() => { navigate("articles"); setSelectedArticleId(null); }}
           >
             記事
           </button>
           <button
             className={tab === "register" ? "active" : ""}
-            onClick={() => setTab("register")}
+            onClick={() => navigate("register")}
           >
             記事登録
           </button>
           <button
             className={tab === "manage" ? "active" : ""}
-            onClick={() => setTab("manage")}
+            onClick={() => navigate("manage")}
           >
             管理
           </button>
+          <button className="signout-btn nav-signout" onClick={signOut}>
+            ログアウト
+          </button>
         </nav>
-        <button className="signout-btn" onClick={signOut}>
-          ログアウト
-        </button>
+        <div className="header-right">
+          <button className="signout-btn" onClick={signOut}>
+            ログアウト
+          </button>
+          <button
+            className="hamburger-btn"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="メニュー"
+          >
+            <span className={menuOpen ? "bar bar-top open" : "bar bar-top"} />
+            <span className={menuOpen ? "bar bar-mid open" : "bar bar-mid"} />
+            <span className={menuOpen ? "bar bar-bot open" : "bar bar-bot"} />
+          </button>
+        </div>
       </header>
+      {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)} />}
       <main>
         {tab === "list" && <WordList />}
         {tab === "quiz" && <Quiz />}
