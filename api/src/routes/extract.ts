@@ -79,18 +79,25 @@ extract.post("/commentary", async (c) => {
     return c.json({ error: "Anthropic APIキーが設定されていません" }, 400);
   }
 
-  const message = await client.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 32000,
-    system:
-      "あなたは英語教育のスペシャリストです。英語がほとんど読めない日本語話者に向けて、英語記事の詳細な解説を行ってください。専門的な内容の記事も扱うため、背景知識の補足も行ってください。",
-    messages: [
-      {
-        role: "user",
-        content: `以下の英語記事を解説してください。\n\n## 構造・文法・翻訳\n文をチャンクに分けて、チャンクごとに「翻訳 → 文法説明」の順で解説してください。\n最後に全文翻訳を記載してください。\n\n## 要約\n記事の内容を日本語で要約してください。\n\n記事:\n${body.text}`,
-      },
-    ],
-  });
+  let message;
+  try {
+    message = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 16000,
+      system:
+        "あなたは英語教育のスペシャリストです。英語がほとんど読めない日本語話者に向けて、英語記事の詳細な解説を行ってください。専門的な内容の記事も扱うため、背景知識の補足も行ってください。",
+      messages: [
+        {
+          role: "user",
+          content: `以下の英語記事を解説してください。\n\n## 構造・文法・翻訳\n文をチャンクに分けて、チャンクごとに「翻訳 → 文法説明」の順で解説してください。\n最後に全文翻訳を記載してください。\n\n## 要約\n記事の内容を日本語で要約してください。\n\n記事:\n${body.text}`,
+        },
+      ],
+    });
+  } catch (e) {
+    console.error("[extract/commentary] Anthropic API error:", e);
+    const reason = e instanceof Error ? e.message : String(e);
+    return c.json({ error: `解説の生成に失敗しました: ${reason}` }, 500);
+  }
 
   if (message.stop_reason === "max_tokens") {
     console.warn("[extract/commentary] Response was cut off due to max_tokens limit");
