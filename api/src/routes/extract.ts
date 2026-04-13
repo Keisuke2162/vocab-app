@@ -81,7 +81,7 @@ extract.post("/commentary", async (c) => {
 
   const message = await client.messages.create({
     model: "claude-opus-4-6",
-    max_tokens: 8192,
+    max_tokens: 32000,
     system:
       "あなたは英語教育のスペシャリストです。英語がほとんど読めない日本語話者に向けて、英語記事の詳細な解説を行ってください。専門的な内容の記事も扱うため、背景知識の補足も行ってください。",
     messages: [
@@ -91,6 +91,10 @@ extract.post("/commentary", async (c) => {
       },
     ],
   });
+
+  if (message.stop_reason === "max_tokens") {
+    console.warn("[extract/commentary] Response was cut off due to max_tokens limit");
+  }
 
   const commentary =
     message.content[0].type === "text" ? message.content[0].text : "";
