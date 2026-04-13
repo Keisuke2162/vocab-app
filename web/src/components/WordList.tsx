@@ -15,6 +15,7 @@ export default function WordList() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editEn, setEditEn] = useState("");
   const [editJa, setEditJa] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setLoading(true);
@@ -58,6 +59,40 @@ export default function WordList() {
     setAllWords((prev) => prev.filter((w) => w.id !== id));
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const allSelected = words.length > 0 && words.every((w) => selectedIds.has(w.id));
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        words.forEach((w) => next.delete(w.id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        words.forEach((w) => next.add(w.id));
+        return next;
+      });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`選択した ${selectedIds.size} 件の単語を削除しますか？`)) return;
+    await Promise.all([...selectedIds].map((id) => deleteWord(token, id)));
+    setAllWords((prev) => prev.filter((w) => !selectedIds.has(w.id)));
+    setSelectedIds(new Set());
+  };
+
   return (
     <div>
       <div className="filter-bar">
@@ -76,13 +111,28 @@ export default function WordList() {
       {error && <p className="error">{error}</p>}
 
       {!loading && words.length > 0 && (
-        <p className="word-count">{words.length} 件</p>
+        <div className="word-list-toolbar">
+          <p className="word-count">{words.length} 件</p>
+          {selectedIds.size > 0 && (
+            <button className="btn-bulk-delete" onClick={handleBulkDelete}>
+              {selectedIds.size} 件を削除
+            </button>
+          )}
+        </div>
       )}
 
       {!loading && (
         <table className="word-table">
           <thead>
             <tr>
+              <th className="col-select">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                  disabled={words.length === 0}
+                />
+              </th>
               <th>クイズ</th>
               <th>英語</th>
               <th>日本語</th>
@@ -93,6 +143,9 @@ export default function WordList() {
             {words.map((w) =>
               editingId === w.id ? (
                 <tr key={w.id}>
+                  <td className="col-select">
+                    <input type="checkbox" checked={selectedIds.has(w.id)} onChange={() => toggleSelect(w.id)} />
+                  </td>
                   <td className="quiz-check">
                     <input type="checkbox" checked={w.quiz_enabled} readOnly />
                   </td>
@@ -117,6 +170,9 @@ export default function WordList() {
                 </tr>
               ) : (
                 <tr key={w.id} className={w.quiz_enabled ? "" : "quiz-off"}>
+                  <td className="col-select">
+                    <input type="checkbox" checked={selectedIds.has(w.id)} onChange={() => toggleSelect(w.id)} />
+                  </td>
                   <td className="quiz-check">
                     <input
                       type="checkbox"
