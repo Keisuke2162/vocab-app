@@ -675,13 +675,80 @@ button:disabled {
   font-size: 0.9rem;
   line-height: 1.8;
   color: #1d1d1f;
-  white-space: pre-wrap;
   word-break: break-word;
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   margin: 0;
+}
+
+.commentary-text h1,
+.commentary-text h2,
+.commentary-text h3,
+.commentary-text h4 {
+  margin: 1em 0 0.4em;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.commentary-text h1 { font-size: 1.3rem; }
+.commentary-text h2 { font-size: 1.15rem; }
+.commentary-text h3 { font-size: 1rem; }
+
+.commentary-text p {
+  margin: 0.6em 0;
+}
+
+.commentary-text ul,
+.commentary-text ol {
+  margin: 0.6em 0;
+  padding-left: 1.5em;
+}
+
+.commentary-text li {
+  margin: 0.3em 0;
+}
+
+.commentary-text code {
+  background: #f0f0f5;
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.commentary-text pre {
+  background: #f0f0f5;
+  border-radius: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+}
+
+.commentary-text pre code {
+  background: none;
+  padding: 0;
+}
+
+.commentary-text blockquote {
+  border-left: 3px solid #c7c7cc;
+  margin: 0.6em 0;
+  padding: 0 0 0 1em;
+  color: #6e6e73;
+}
+
+.commentary-text strong {
+  font-weight: 700;
+}
+
+.commentary-text em {
+  font-style: italic;
+}
+
+.commentary-text hr {
+  border: none;
+  border-top: 1px solid #e5e5ea;
+  margin: 1em 0;
 }
 
 .generate-commentary-btn {
