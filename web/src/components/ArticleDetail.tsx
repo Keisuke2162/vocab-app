@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ArticleWithWords } from "../types";
 import { fetchArticle, patchWord, extractCommentary, patchArticle } from "../api";
 import { useAuth } from "../contexts/AuthContext";
@@ -72,7 +73,9 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
       <section className="detail-section">
         <h3 className="detail-section-title">解説</h3>
         {article.commentary ? (
-          <pre className="commentary-text">{article.commentary}</pre>
+          <div className="commentary-text">
+            <ReactMarkdown>{article.commentary}</ReactMarkdown>
+          </div>
         ) : (
           <>
             {article.original_text ? (
