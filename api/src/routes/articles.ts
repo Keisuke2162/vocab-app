@@ -75,6 +75,27 @@ articles.post("/", async (c) => {
   return c.json({ data }, 201);
 });
 
+// PATCH /articles/:id
+articles.patch("/:id", async (c) => {
+  const user = c.get("user");
+  const id = c.req.param("id");
+  const body = await c.req.json<{ commentary?: string }>();
+
+  const { data, error } = await serviceSupabase
+    .from("articles")
+    .update(body)
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") return c.json({ error: "Not found" }, 404);
+    return c.json({ error: error.message }, 500);
+  }
+  return c.json({ data });
+});
+
 // DELETE /articles/:id
 articles.delete("/:id", async (c) => {
   const user = c.get("user");

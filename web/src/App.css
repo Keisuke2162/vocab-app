@@ -576,6 +576,26 @@ button:disabled {
   margin: 0;
 }
 
+.generate-commentary-btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #1d1d1f;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.generate-commentary-btn:hover {
+  background: #3a3a3c;
+}
+
+.generate-commentary-btn:disabled {
+  background: #aeaeb2;
+  cursor: not-allowed;
+}
+
 /* Settings */
 .settings {
   max-width: 480px;
