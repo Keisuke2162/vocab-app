@@ -751,6 +751,37 @@ button:disabled {
   margin: 1em 0;
 }
 
+.detail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.detail-section-header .detail-section-title {
+  margin-bottom: 0;
+}
+
+.regenerate-commentary-btn {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6e6e73;
+  background: none;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.regenerate-commentary-btn:hover {
+  background: #f5f5f7;
+}
+
+.regenerate-commentary-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .generate-commentary-btn {
   padding: 10px 20px;
   font-size: 0.9rem;

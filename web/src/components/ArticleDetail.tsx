@@ -42,7 +42,7 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
     );
   };
 
-  const handleGenerateCommentary = async () => {
+  const runGenerateCommentary = async () => {
     if (!article?.original_text) return;
     setGenerating(true);
     setGenerateError("");
@@ -55,6 +55,13 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleGenerateCommentary = () => runGenerateCommentary();
+
+  const handleRegenerateCommentary = () => {
+    if (!window.confirm("解説を再生成しますか？\n現在の解説は上書きされます。")) return;
+    runGenerateCommentary();
   };
 
   if (loading) return <p className="status">読み込み中...</p>;
@@ -71,29 +78,41 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
       </p>
 
       <section className="detail-section">
-        <h3 className="detail-section-title">解説</h3>
-        {article.commentary ? (
+        <div className="detail-section-header">
+          <h3 className="detail-section-title">解説</h3>
+          {article.commentary && article.original_text && (
+            <button
+              className="regenerate-commentary-btn"
+              onClick={handleRegenerateCommentary}
+              disabled={generating}
+            >
+              {generating ? "生成中..." : "再生成"}
+            </button>
+          )}
+        </div>
+        {generating && article.commentary && (
+          <p className="status">生成中...</p>
+        )}
+        {article.commentary && !generating ? (
           <div className="commentary-text">
             <ReactMarkdown>{article.commentary}</ReactMarkdown>
           </div>
-        ) : (
+        ) : !article.commentary ? (
           <>
             {article.original_text ? (
-              <>
-                {generateError && <p className="error">{generateError}</p>}
-                <button
-                  className="generate-commentary-btn"
-                  onClick={handleGenerateCommentary}
-                  disabled={generating}
-                >
-                  {generating ? "生成中..." : "解説を生成する"}
-                </button>
-              </>
+              <button
+                className="generate-commentary-btn"
+                onClick={handleGenerateCommentary}
+                disabled={generating}
+              >
+                {generating ? "生成中..." : "解説を生成する"}
+              </button>
             ) : (
               <p className="status">元の記事テキストがないため解説を生成できません</p>
             )}
           </>
-        )}
+        ) : null}
+        {generateError && <p className="error">{generateError}</p>}
       </section>
 
       <section className="detail-section">
