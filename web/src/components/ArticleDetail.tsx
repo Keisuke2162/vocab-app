@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ArticleWithWords } from "../types";
-import { fetchArticle, patchWord } from "../api";
+import { fetchArticle, patchWord, extractCommentary, patchArticle } from "../api";
 import { useAuth } from "../contexts/AuthContext";
 
 interface Props {
@@ -15,6 +15,8 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
   const [article, setArticle] = useState<ArticleWithWords | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState("");
 
   useEffect(() => {
     if (!token) return;
@@ -39,6 +41,21 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
     );
   };
 
+  const handleGenerateCommentary = async () => {
+    if (!article?.original_text) return;
+    setGenerating(true);
+    setGenerateError("");
+    try {
+      const commentary = await extractCommentary(token, article.original_text);
+      await patchArticle(token, article.id, { commentary });
+      setArticle((prev) => prev ? { ...prev, commentary } : prev);
+    } catch (e: unknown) {
+      setGenerateError(e instanceof Error ? e.message : "解説の生成に失敗しました");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   if (loading) return <p className="status">読み込み中...</p>;
   if (error) return <p className="error">{error}</p>;
   if (!article) return null;
@@ -52,17 +69,29 @@ export default function ArticleDetail({ articleId, onBack }: Props) {
         {new Date(article.created_at).toLocaleDateString("ja-JP")}
       </p>
 
-      {article.commentary ? (
-        <section className="detail-section">
-          <h3 className="detail-section-title">解説</h3>
+      <section className="detail-section">
+        <h3 className="detail-section-title">解説</h3>
+        {article.commentary ? (
           <pre className="commentary-text">{article.commentary}</pre>
-        </section>
-      ) : (
-        <section className="detail-section">
-          <h3 className="detail-section-title">解説</h3>
-          <p className="status">解説はまだ生成されていません</p>
-        </section>
-      )}
+        ) : (
+          <>
+            {article.original_text ? (
+              <>
+                {generateError && <p className="error">{generateError}</p>}
+                <button
+                  className="generate-commentary-btn"
+                  onClick={handleGenerateCommentary}
+                  disabled={generating}
+                >
+                  {generating ? "生成中..." : "解説を生成する"}
+                </button>
+              </>
+            ) : (
+              <p className="status">元の記事テキストがないため解説を生成できません</p>
+            )}
+          </>
+        )}
+      </section>
 
       <section className="detail-section">
         <h3 className="detail-section-title">登録単語（{article.words.length}語）</h3>

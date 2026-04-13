@@ -127,6 +127,18 @@ export async function saveArticle(
   return json.data as Article;
 }
 
+export async function patchArticle(
+  token: string,
+  id: string,
+  data: { commentary?: string }
+): Promise<Article> {
+  const json = await authFetch(`${BASE}/articles/${id}`, token, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return json.data as Article;
+}
+
 export async function deleteArticle(token: string, id: string): Promise<void> {
   await authFetch(`${BASE}/articles/${id}`, token, { method: "DELETE" });
 }
@@ -143,4 +155,15 @@ export async function extractWords(
   });
   const words = (json.data as { words: { en: string; ja: string }[] }).words;
   return words.map((w) => ({ ...w, quiz_enabled: true }));
+}
+
+export async function extractCommentary(
+  token: string,
+  text: string
+): Promise<string> {
+  const json = await authFetch(`${BASE}/extract/commentary`, token, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+  return (json.data as { commentary: string }).commentary;
 }
