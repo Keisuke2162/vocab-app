@@ -627,6 +627,39 @@ button:disabled {
   color: #6e6e73;
 }
 
+.article-list-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.article-title-input {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  border: 1px solid #0071e3;
+  border-radius: 6px;
+  padding: 2px 8px;
+  width: 100%;
+  outline: none;
+  background: #fff;
+}
+
+.btn-edit-sm {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  color: #0071e3;
+  background: none;
+  border: 1px solid #0071e3;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-edit-sm:hover {
+  background: #e8f0fe;
+}
+
 /* Article Detail */
 .article-detail {
   max-width: 900px;

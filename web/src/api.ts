@@ -130,7 +130,7 @@ export async function saveArticle(
 export async function patchArticle(
   token: string,
   id: string,
-  data: { commentary?: string }
+  data: { title?: string; commentary?: string }
 ): Promise<Article> {
   const json = await authFetch(`${BASE}/articles/${id}`, token, {
     method: "PATCH",

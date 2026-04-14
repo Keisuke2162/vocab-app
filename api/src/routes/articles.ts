@@ -79,7 +79,7 @@ articles.post("/", async (c) => {
 articles.patch("/:id", async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
-  const body = await c.req.json<{ commentary?: string }>();
+  const body = await c.req.json<{ title?: string; commentary?: string }>();
 
   const { data, error } = await serviceSupabase
     .from("articles")
