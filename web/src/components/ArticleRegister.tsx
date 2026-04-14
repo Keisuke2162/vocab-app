@@ -59,7 +59,7 @@ export default function ArticleRegister() {
   };
 
   const handleSave = async () => {
-    if (!title.trim() || !extracted) return;
+    if (!extracted) return;
     setSaving(true);
     setError("");
     try {
@@ -74,13 +74,14 @@ export default function ArticleRegister() {
             en: w.en,
             ja: w.ja,
             tags: selectedTags,
-            source: title,
+            source: title || undefined,
             article_id: article.id,
             quiz_enabled: w.quiz_enabled,
           })
         )
       );
-      setSuccessMsg(`「${title}」を保存しました（${extracted.length}語）`);
+      const label = title.trim() ? `「${title}」を` : "";
+      setSuccessMsg(`${label}保存しました（${extracted.length}語）`);
       setTimeout(() => setSuccessMsg(""), 4000);
       setTitle("");
       setText("");
@@ -101,7 +102,7 @@ export default function ArticleRegister() {
       {error && <p className="error">{error}</p>}
 
       <div className="form-group">
-        <label className="form-label">タイトル</label>
+        <label className="form-label">タイトル（任意）</label>
         <input
           className="form-input"
           type="text"
@@ -121,24 +122,6 @@ export default function ArticleRegister() {
           rows={10}
         />
       </div>
-
-      {tags.length > 0 && (
-        <div className="form-group">
-          <label className="form-label">タグ</label>
-          <div className="tag-chips">
-            {tags.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`tag-chip ${selectedTags.includes(t.name) ? "selected" : ""}`}
-                onClick={() => toggleTag(t.name)}
-              >
-                {t.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <button
         className="extract-btn"
@@ -178,16 +161,32 @@ export default function ArticleRegister() {
               ))}
             </tbody>
           </table>
+
+          {tags.length > 0 && (
+            <div className="form-group extract-tags">
+              <label className="form-label">タグ</label>
+              <div className="tag-chips">
+                {tags.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`tag-chip ${selectedTags.includes(t.name) ? "selected" : ""}`}
+                    onClick={() => toggleTag(t.name)}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button
             className="save-btn"
             onClick={handleSave}
-            disabled={saving || !title.trim()}
+            disabled={saving}
           >
             {saving ? "保存中..." : "保存する"}
           </button>
-          {!title.trim() && (
-            <p className="save-hint">保存するにはタイトルを入力してください</p>
-          )}
         </div>
       )}
     </div>
