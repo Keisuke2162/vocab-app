@@ -370,6 +370,11 @@ button:disabled {
   color: #6e6e73;
 }
 
+.extract-tags {
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
 .word-register-table {
   width: 100%;
   border-collapse: collapse;
